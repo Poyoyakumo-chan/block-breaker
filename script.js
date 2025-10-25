@@ -27,7 +27,7 @@ function resetBallAndPaddle() {
     dx: 0
   };
 
-  const baseSpeed = 4;
+  const baseSpeed = 2.5; // ← ボール速度を落とした
   ball = {
     x: cw / 2,
     y: ch * 0.85,
@@ -86,7 +86,7 @@ function drawBall() {
   ball.trail.push({ x: ball.x, y: ball.y });
   if (ball.trail.length > 10) ball.trail.shift();
 
-  // トレイル描画
+  // トレイル
   ball.trail.forEach((t, i) => {
     ctx.beginPath();
     ctx.arc(t.x, t.y, ball.radius * (i / 10 + 0.5), 0, Math.PI * 2);
@@ -112,8 +112,6 @@ function drawBricks() {
   });
   ctx.shadowBlur = 0;
 }
-
-// パーティクル描画
 function drawParticles() {
   particles.forEach((p, i) => {
     ctx.beginPath();
@@ -176,8 +174,7 @@ function update() {
       ball.dy *= -1;
       state.score += 10;
       scoreEl.textContent = `スコア: ${state.score}`;
-
-      createParticles(ball.x, ball.y, "0,255,255"); // パーティクル
+      createParticles(ball.x, ball.y, "0,255,255");
     }
   });
 
