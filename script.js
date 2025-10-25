@@ -98,27 +98,22 @@
     const cw = canvas.width / (window.devicePixelRatio || 1);
     const ch = canvas.height / (window.devicePixelRatio || 1);
 
-    // パドル移動
     paddle.x += paddle.dx*paddle.speed;
     if(paddle.x<0) paddle.x=0;
     if(paddle.x+paddle.width>cw) paddle.x=cw-paddle.width;
 
-    // ボール移動
     ball.x += ball.dx;
     ball.y += ball.dy;
 
-    // 壁反射
     if(ball.x-ball.radius<0 || ball.x+ball.radius>cw) ball.dx*=-1;
     if(ball.y-ball.radius<0) ball.dy*=-1;
 
-    // パドル衝突
     if(ball.y+ball.radius>=paddle.y && ball.y+ball.radius<=paddle.y+paddle.height &&
        ball.x>=paddle.x && ball.x<=paddle.x+paddle.width){
       ball.dy*=-1;
       ball.y=paddle.y-ball.radius;
     }
 
-    // ブロック衝突
     for(let b of bricks){
       if(!b.broken){
         if(ball.x>b.x && ball.x<b.x+b.width &&
@@ -129,7 +124,6 @@
       }
     }
 
-    // ゲームオーバー
     if(ball.y>ch){
       state.running=false;
       state.gameOver=true;
@@ -137,7 +131,6 @@
       return;
     }
 
-    // ステージクリア
     if(bricks.every(b=>b.broken)){
       state.running=false;
       state.won=true;
@@ -171,7 +164,6 @@
     requestAnimationFrame(loop);
   }
 
-  // --- ウィンドウリサイズ ---
   window.addEventListener("resize", adjustCanvas);
 
   // --- 初期化 ---
