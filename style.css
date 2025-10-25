@@ -1,7 +1,6 @@
 body {
   margin: 0;
   overflow: hidden;
-  background: linear-gradient(180deg, #0a0f25 0%, #001133 100%);
   font-family: "Arial", sans-serif;
   color: #fff;
 }
@@ -14,13 +13,14 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 20; /* ←最前面に固定 */
+  z-index: 20;
   touch-action: none;
 }
 
 #startScreen h1 {
   font-size: 2rem;
   margin-bottom: 20px;
+  text-shadow: 0 0 10px #00ffff;
 }
 
 #startBtn {
@@ -30,8 +30,9 @@ body {
   border-radius: 10px;
   background: #00ccff;
   color: #fff;
-  z-index: 21; /* ←明示的にボタンを前面 */
+  z-index: 21;
   touch-action: manipulation;
+  box-shadow: 0 0 10px #00ccff;
 }
 
 #hud {
@@ -48,5 +49,3 @@ canvas {
   height: 100vh;
   z-index: 1;
 }
-
-
