@@ -8,7 +8,6 @@
   let paddle, ball, bricks;
   const state = { running: false, paused: true, won: false, gameOver: false };
 
-  // --- Canvasサイズ調整（高DPI対応）
   function adjustCanvas() {
     const ratio = window.devicePixelRatio || 1;
     const cw = window.innerWidth;
@@ -20,7 +19,6 @@
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   }
 
-  // --- パドル・ボール初期化
   function resetBallAndPaddle() {
     const cw = canvas.width / (window.devicePixelRatio || 1);
     const ch = canvas.height / (window.devicePixelRatio || 1);
@@ -28,7 +26,6 @@
     ball = { x: cw/2, y: ch-70, radius:8, dx:4, dy:-4 };
   }
 
-  // --- ブロック作成 ---
   function createBricks() {
     const cw = canvas.width / (window.devicePixelRatio || 1);
     const rows = 5, cols = 7;
@@ -43,24 +40,17 @@
     }
   }
 
-  // --- 描画 ---
   function draw() {
     const cw = canvas.width / (window.devicePixelRatio || 1);
     const ch = canvas.height / (window.devicePixelRatio || 1);
     ctx.clearRect(0,0,cw,ch);
-
-    // パドル
     ctx.fillStyle="dodgerblue";
     ctx.fillRect(paddle.x,paddle.y,paddle.width,paddle.height);
-
-    // ボール
     ctx.beginPath();
     ctx.arc(ball.x,ball.y,ball.radius,0,Math.PI*2);
     ctx.fillStyle="red";
     ctx.fill();
     ctx.closePath();
-
-    // ブロック
     for(let b of bricks){
       if(!b.broken){
         ctx.fillStyle="orange";
@@ -69,7 +59,6 @@
     }
   }
 
-  // --- 入力 ---
   function handleInput(x){
     const cw = canvas.width / (window.devicePixelRatio || 1);
     paddle.x = x - paddle.width/2;
@@ -78,13 +67,17 @@
   }
 
   canvas.addEventListener("mousemove", e => handleInput(e.offsetX));
+  canvas.addEventListener("touchstart", e => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    handleInput(e.touches[0].clientX - rect.left);
+  });
   canvas.addEventListener("touchmove", e => {
     e.preventDefault();
     const rect = canvas.getBoundingClientRect();
     handleInput(e.touches[0].clientX - rect.left);
   });
 
-  // --- オーバーレイ表示 ---
   function showOverlay(text, btnText="スタート") {
     overlayText.textContent = text;
     startBtn.textContent = btnText;
@@ -92,7 +85,6 @@
     state.paused = true;
   }
 
-  // --- ゲーム更新 ---
   function update() {
     if(!state.running || state.paused) return;
     const cw = canvas.width / (window.devicePixelRatio || 1);
@@ -144,14 +136,16 @@
 
   function loop(){ update(); }
 
-  // --- スタートボタン ---
-  startBtn.addEventListener("click", () => {
+  function startGame(){
     adjustCanvas();
+    overlay.classList.add("hidden");
     if(!state.running || state.gameOver || state.won) startNewGame();
-    else { state.paused=false; overlay.classList.add("hidden"); requestAnimationFrame(loop); }
-  });
+    else { state.paused=false; requestAnimationFrame(loop); }
+  }
 
-  // --- 新しいゲーム開始 ---
+  startBtn.addEventListener("click", startGame);
+  startBtn.addEventListener("touchstart", startGame); // Android対応
+
   function startNewGame(){
     adjustCanvas();
     resetBallAndPaddle();
@@ -166,10 +160,11 @@
 
   window.addEventListener("resize", adjustCanvas);
 
-  // --- 初期化 ---
+  // 初期化
   adjustCanvas();
   resetBallAndPaddle();
   createBricks();
   draw();
-  showOverlay("クリックしてゲームを始める", "スタート");
+  showOverlay("タップしてゲームを始める", "スタート");
 })();
+
