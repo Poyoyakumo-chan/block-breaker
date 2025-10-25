@@ -172,4 +172,9 @@ function startGame() {
   draw();
 }
 
-startBtn.addEventListener("click", startGame);
+startBtn.addEventListener("click", () => {
+  startScreen.style.display = "none";
+  setTimeout(startGame, 50); // ← Androidでタップ反応を安定させるための遅延
+});
+
+
