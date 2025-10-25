@@ -1,22 +1,21 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>スマホ対応ブロック崩し</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>ブロック崩し</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="startScreen" class="overlay">
+  <div id="startScreen">
     <h1>ブロック崩し</h1>
     <button id="startBtn">スタート</button>
   </div>
-  <canvas id="gameCanvas"></canvas>
-  <div id="scoreBoard">
+  <div id="hud">
     <span id="score">スコア: 0</span>
     <span id="level">レベル: 1</span>
   </div>
+  <canvas id="gameCanvas"></canvas>
   <script src="script.js"></script>
 </body>
 </html>
-
