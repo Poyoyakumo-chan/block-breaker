@@ -1,35 +1,20 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>簡単なブロック崩しゲーム</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ブロック崩しゲーム</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="wrapper">
-    <header>
-      <h1>ブロック崩し</h1>
-      <div class="hud">
-        <div id="score">Score: 0</div>
-        <div id="lives">Lives: 3</div>
-      </div>
-    </header>
-
-    <main>
-      <!-- ゲームキャンバス -->
-      <canvas id="gameCanvas" width="800" height="600"></canvas>
-      <!-- 状態表示 -->
-      <div id="overlay" class="overlay hidden">
-        <div id="overlayText"></div>
-        <button id="startBtn">スタート / 再開</button>
-      </div>
-    </main>
-
-    <footer>
-      <small>矢印キー / A D で操作。マウスでもパドル移動可。</small>
-    </footer>
+  <!-- オーバーレイ（スタート画面 / ゲームオーバー / クリア用） -->
+  <div id="overlay">
+    <div id="overlayText">クリックしてゲームを始める</div>
+    <button id="startBtn">スタート</button>
   </div>
+
+  <!-- ゲームキャンバス -->
+  <canvas id="gameCanvas"></canvas>
 
   <script src="script.js"></script>
 </body>
