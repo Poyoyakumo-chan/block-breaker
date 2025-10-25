@@ -7,38 +7,33 @@ const levelEl = document.getElementById("level");
 
 let cw, ch, paddle, ball, bricks = [], state = { playing: false, score: 0, level: 1 };
 
-// 📱 高DPI対応
+// 📱 Canvas初期化
 function resizeCanvas() {
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = window.innerWidth * dpr;
-  canvas.height = window.innerHeight * dpr;
-  canvas.style.width = `${window.innerWidth}px`;
-  canvas.style.height = `${window.innerHeight}px`;
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.scale(dpr, dpr);
-  cw = window.innerWidth;
-  ch = window.innerHeight;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  cw = canvas.width;
+  ch = canvas.height;
 }
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-// 🧱 初期化
+// 🧱 ゲーム初期化
 function resetBallAndPaddle() {
-  const base = cw;
   paddle = {
-    width: base * 0.25,
-    height: base * 0.02,
-    x: (cw - base * 0.25) / 2,
-    y: ch - base * 0.08,
+    width: cw * 0.25,
+    height: ch * 0.02,
+    x: cw * 0.375,
+    y: ch * 0.9,
     dx: 0
   };
-  const speed = Math.max(2, base / 600);
+
+  const baseSpeed = Math.max(3, cw / 400);
   ball = {
     x: cw / 2,
-    y: ch - base * 0.1,
-    radius: base * 0.015,
-    dx: speed,
-    dy: -speed
+    y: ch * 0.85,
+    radius: cw * 0.015,
+    dx: baseSpeed * (Math.random() < 0.5 ? -1 : 1),
+    dy: -baseSpeed
   };
 }
 
@@ -46,13 +41,16 @@ function createBricks() {
   const rows = 4 + state.level;
   const cols = 7;
   const brickWidth = cw / cols - 8;
-  const brickHeight = cw * 0.03;
+  const brickHeight = ch * 0.03;
   bricks = [];
+
+  const topOffset = ch * 0.1;
+
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       bricks.push({
         x: c * (brickWidth + 6) + 3,
-        y: r * (brickHeight + 6) + 60,
+        y: topOffset + r * (brickHeight + 6),
         width: brickWidth,
         height: brickHeight,
         visible: true,
@@ -82,7 +80,7 @@ function drawBricks() {
   });
 }
 
-// 🕹 更新
+// 🕹 ゲーム更新
 function update() {
   if (!state.playing) return;
 
@@ -93,7 +91,7 @@ function update() {
   ball.x += ball.dx;
   ball.y += ball.dy;
 
-  // 壁
+  // 壁反射
   if (ball.x < ball.radius || ball.x > cw - ball.radius) ball.dx *= -1;
   if (ball.y < ball.radius) ball.dy *= -1;
 
@@ -107,10 +105,13 @@ function update() {
 
   // パドル反射
   if (
-    ball.x > paddle.x && ball.x < paddle.x + paddle.width &&
-    ball.y + ball.radius > paddle.y && ball.y - ball.radius < paddle.y + paddle.height
+    ball.x > paddle.x &&
+    ball.x < paddle.x + paddle.width &&
+    ball.y + ball.radius > paddle.y &&
+    ball.y - ball.radius < paddle.y + paddle.height
   ) {
     ball.dy *= -1;
+    ball.y = paddle.y - ball.radius;
   }
 
   // ブロック衝突
@@ -158,7 +159,7 @@ window.addEventListener("touchmove", e => {
   paddle.x = touch.clientX - paddle.width / 2;
 });
 
-// 🚀 開始
+// 🚀 ゲーム開始
 function startGame() {
   state.playing = true;
   state.score = 0;
@@ -172,5 +173,3 @@ function startGame() {
 }
 
 startBtn.addEventListener("click", startGame);
-
-
