@@ -7,15 +7,12 @@ const levelEl = document.getElementById("level");
 
 let cw, ch, paddle, ball, bricks = [], state = { playing: false, score: 0, level: 1 };
 
-// 🧭 Canvasリサイズ（高DPI対応の安定版）
+// 🧭 Canvasリサイズ（高DPI調整削除版）
 function resizeCanvas() {
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = window.innerWidth * dpr;
-  canvas.height = window.innerHeight * dpr;
-  ctx.setTransform(1, 0, 0, 1, 0, 0); // スケールリセット
-  ctx.scale(dpr, dpr);
-  cw = window.innerWidth;
-  ch = window.innerHeight;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  cw = canvas.width;
+  ch = canvas.height;
 }
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
@@ -31,7 +28,7 @@ function resetBallAndPaddle() {
     dx: 0 
   };
 
-  // 画面高さに応じて速度スケール
+  // 画面高さに応じて速度スケール（縦長Android調整）
   const speedScale = ch / 800;
   const baseSpeed = 2 / speedScale;
 
@@ -39,24 +36,24 @@ function resetBallAndPaddle() {
     x: cw / 2, 
     y: ch - 80, 
     radius: 8, 
-    dx: (baseSpeed + state.level * 0.5), 
-    dy: -(baseSpeed + state.level * 0.5)
+    dx: (baseSpeed + state.level * 0.4), 
+    dy: -(baseSpeed + state.level * 0.4)
   };
 }
 
 // 🧱 ブロック生成
 function createBricks() {
   const rows = 4 + state.level;
-  const cols = 6;
-  const brickWidth = cw / cols - 10;
-  const brickHeight = 18;
+  const cols = 7;
+  const brickWidth = cw / cols - 6;
+  const brickHeight = 16;
   bricks = [];
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const color = `hsl(${Math.random() * 360}, 80%, 60%)`;
       bricks.push({ 
-        x: c * (brickWidth + 10) + 5, 
-        y: r * (brickHeight + 10) + 40, 
+        x: c * (brickWidth + 6) + 3, 
+        y: r * (brickHeight + 6) + 50, 
         width: brickWidth, 
         height: brickHeight, 
         visible: true, 
@@ -100,7 +97,7 @@ function update() {
   if (ball.x < ball.radius || ball.x > cw - ball.radius) ball.dx *= -1;
   if (ball.y < ball.radius) ball.dy *= -1;
 
-  // 下に落ちたらリセット
+  // 下に落ちたらゲームオーバー
   if (ball.y > ch - ball.radius) {
     state.playing = false;
     startScreen.innerHTML = `<h1>ゲームオーバー</h1><p>スコア: ${state.score}</p><button id='restartBtn'>リスタート</button>`;
@@ -176,3 +173,4 @@ function startGame() {
 }
 
 startBtn.addEventListener("click", startGame);
+
