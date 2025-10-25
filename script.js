@@ -1,5 +1,4 @@
-// 簡単なブロック崩しゲーム（スマホ対応版）
-// キーボード / マウス / タッチ操作対応
+// ブロック崩しゲーム（スマホ対応・黒画面修正版）
 (() => {
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
@@ -25,14 +24,7 @@
   const state = { score: 0, lives: 3, running: false, paused: true, won: false, gameOver: false };
 
   // パドル
-  const paddle = {
-    width: 110,
-    height: 12,
-    x: 0,
-    y: 0,
-    speed: 8,
-    dx: 0,
-  };
+  const paddle = { width: 110, height: 12, x: 0, y: 0, speed: 8, dx: 0 };
 
   // ボール
   const ball = { radius: 9, x: 0, y: 0, speed: 4, vx: 4, vy: -4 };
@@ -41,7 +33,6 @@
   const brickConfig = { rows: 5, cols: 9, width: 70, height: 20, padding: 10, offsetTop: 60, offsetLeft: 35 };
   let bricks = [];
 
-  // --- 初期化 ---
   function initBricks() {
     bricks = [];
     for (let r = 0; r < brickConfig.rows; r++) {
@@ -54,6 +45,7 @@
   }
 
   function resetBallAndPaddle() {
+    adjustCanvasForHiDPI(); // サイズを再調整
     const cw = canvas.width / (window.devicePixelRatio || 1);
     const ch = canvas.height / (window.devicePixelRatio || 1);
     paddle.x = (cw - paddle.width) / 2;
@@ -82,10 +74,8 @@
 
   // --- 描画 ---
   function clear() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-
   function drawPaddle() { roundRect(ctx, paddle.x, paddle.y, paddle.width, paddle.height, 6, true, false, '#118ab2'); }
   function drawBall() { ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2); ctx.fillStyle = '#ffd166'; ctx.fill(); ctx.closePath(); }
-
   function drawBricks() {
     const colors = ['#ef476f', '#ffd166', '#06d6a0', '#118ab2', '#8338ec'];
     for (let r = 0; r < brickConfig.rows; r++) {
@@ -153,7 +143,6 @@
       }
     }
 
-    // 下端チェック
     if (ball.y - ball.radius > ch) {
       state.lives--;
       updateHUD();
@@ -172,7 +161,6 @@
     const dx = circle.x - closestX, dy = circle.y - closestY;
     return (dx*dx + dy*dy) < (circle.radius*circle.radius);
   }
-
   function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
   function isAllBricksCleared(){return bricks.every(row=>row.every(b=>b.status===0));}
 
@@ -196,17 +184,7 @@
   function handleKeyDown(e){keys[e.key]=true; if(keys['ArrowLeft']||keys['a']||keys['A']) paddle.dx=-1; if(keys['ArrowRight']||keys['d']||keys['D']) paddle.dx=1; if(e.key===' '||e.key==='Spacebar'){togglePause(); e.preventDefault();}}
   function handleKeyUp(e){keys[e.key]=false; paddle.dx=keys['ArrowLeft']||keys['a']||keys['A']?-1:keys['ArrowRight']||keys['d']||keys['D']?1:0;}
   function handleMouseMove(e){const rect=canvas.getBoundingClientRect(); paddle.x=e.clientX-rect.left-paddle.width/2; const cw = canvas.width / (window.devicePixelRatio || 1); if(paddle.x<0)paddle.x=0; if(paddle.x+paddle.width>cw)paddle.x=cw-paddle.width;}
-
-  // --- タッチ操作 ---
-  function handleTouchMove(e){
-    e.preventDefault();
-    const rect=canvas.getBoundingClientRect();
-    const touch=e.touches[0];
-    paddle.x=touch.clientX-rect.left-paddle.width/2;
-    const cw=canvas.width/(window.devicePixelRatio||1);
-    if(paddle.x<0)paddle.x=0;
-    if(paddle.x+paddle.width>cw)paddle.x=cw-paddle.width;
-  }
+  function handleTouchMove(e){e.preventDefault(); const rect=canvas.getBoundingClientRect(); const touch=e.touches[0]; paddle.x=touch.clientX-rect.left-paddle.width/2; const cw=canvas.width/(window.devicePixelRatio||1); if(paddle.x<0)paddle.x=0; if(paddle.x+paddle.width>cw)paddle.x=cw-paddle.width;}
 
   function togglePause(){
     if(!state.running) return;
@@ -215,9 +193,11 @@
     else showOverlay('一時停止','再開',false);
   }
 
-  startBtn.addEventListener('click',()=>{
-    if(!state.running||state.gameOver||state.won) startNewGame();
-    else {state.paused=false; overlay.classList.add('hidden'); requestAnimationFrame(loop);}
+  // --- スタートボタン ---
+  startBtn.addEventListener('click', () => {
+    adjustCanvasForHiDPI(); // 黒画面防止
+    if(!state.running || state.gameOver || state.won) startNewGame();
+    else { state.paused = false; overlay.classList.add('hidden'); requestAnimationFrame(loop); }
   });
 
   // --- 初期化 ---
