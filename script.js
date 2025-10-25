@@ -7,7 +7,7 @@ const levelEl = document.getElementById("level");
 
 let cw, ch, paddle, ball, bricks = [], state = { playing: false, score: 0, level: 1 };
 
-// 📱 Canvas初期化
+// Canvasサイズ
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -17,7 +17,7 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-// 🧱 ゲーム初期化
+// ゲーム初期化
 function resetBallAndPaddle() {
   paddle = {
     width: cw * 0.25,
@@ -27,7 +27,7 @@ function resetBallAndPaddle() {
     dx: 0
   };
 
-  const baseSpeed = Math.max(3, cw / 400);
+  const baseSpeed = 4; // 固定値（端末に依存しない）
   ball = {
     x: cw / 2,
     y: ch * 0.85,
@@ -60,7 +60,7 @@ function createBricks() {
   }
 }
 
-// 🎨 描画関数
+// 描画関数
 function drawPaddle() {
   ctx.fillStyle = "#ff4f81";
   ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
@@ -80,7 +80,7 @@ function drawBricks() {
   });
 }
 
-// 🕹 ゲーム更新
+// 更新
 function update() {
   if (!state.playing) return;
 
@@ -138,7 +138,7 @@ function update() {
   }
 }
 
-// 🔁 ループ
+// ループ
 function draw() {
   ctx.clearRect(0, 0, cw, ch);
   drawBricks();
@@ -148,7 +148,7 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-// 🖐 入力
+// 入力
 window.addEventListener("mousemove", e => {
   if (!state.playing) return;
   paddle.x = e.clientX - paddle.width / 2;
@@ -159,7 +159,7 @@ window.addEventListener("touchmove", e => {
   paddle.x = touch.clientX - paddle.width / 2;
 });
 
-// 🚀 ゲーム開始
+// ゲーム開始
 function startGame() {
   state.playing = true;
   state.score = 0;
@@ -172,9 +172,9 @@ function startGame() {
   draw();
 }
 
-startBtn.addEventListener("click", () => {
-  startScreen.style.display = "none";
-  setTimeout(startGame, 50); // ← Androidでタップ反応を安定させるための遅延
+// スタートボタン対応（Androidタッチも）
+startBtn.addEventListener("click", startGame);
+startBtn.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  startGame();
 });
-
-
