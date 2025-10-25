@@ -20,12 +20,12 @@
     ctx.setTransform(ratio,0,0,ratio,0,0);
   }
 
-  // パドル幅130、ボール速度少し遅く
+  // 🎯 パドルを長く（160px）、ボール速度を遅く
   function resetBallAndPaddle() {
     const cw = canvas.width / (window.devicePixelRatio || 1);
     const ch = canvas.height / (window.devicePixelRatio || 1);
-    paddle = { x: (cw-130)/2, y: ch-50, width: 130, height: 12, speed:7+state.level, dx:0 };
-    ball = { x: cw/2, y: ch-70, radius:8, dx:3+state.level, dy:-3-state.level };
+    paddle = { x: (cw-160)/2, y: ch-50, width: 160, height: 12, speed:6+state.level, dx:0 };
+    ball = { x: cw/2, y: ch-70, radius:8, dx:2+state.level, dy:-2-state.level };
   }
 
   function createBricks() {
@@ -95,8 +95,11 @@
     handleInput(e.touches[0].clientX - rect.left);
   });
 
+  // ✅ iOS対応：スコア反映を強制リフレッシュ
   function updateScore() {
-    scoreBoard.textContent = `スコア: ${state.score} | レベル: ${state.level}`;
+    requestAnimationFrame(() => {
+      scoreBoard.textContent = `スコア: ${state.score} | レベル: ${state.level}`;
+    });
   }
 
   function showOverlay(text, btnText="スタート") {
@@ -176,7 +179,6 @@
 
   window.addEventListener("resize", adjustCanvas);
 
-  // 初期化
   adjustCanvas();
   resetBallAndPaddle();
   createBricks();
@@ -184,4 +186,6 @@
   updateScore();
   showOverlay("タップしてゲームを始める", "スタート");
 })();
+
+
 
