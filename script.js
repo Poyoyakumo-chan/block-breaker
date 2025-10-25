@@ -20,16 +20,17 @@
     ctx.setTransform(ratio,0,0,ratio,0,0);
   }
 
+  // パドル幅130、ボール速度少し遅く
   function resetBallAndPaddle() {
     const cw = canvas.width / (window.devicePixelRatio || 1);
     const ch = canvas.height / (window.devicePixelRatio || 1);
-    paddle = { x: (cw-100)/2, y: ch-50, width: 100, height: 12, speed:7+state.level, dx:0 };
-    ball = { x: cw/2, y: ch-70, radius:8, dx:4+state.level, dy:-4-state.level };
+    paddle = { x: (cw-130)/2, y: ch-50, width: 130, height: 12, speed:7+state.level, dx:0 };
+    ball = { x: cw/2, y: ch-70, radius:8, dx:3+state.level, dy:-3-state.level };
   }
 
   function createBricks() {
     const cw = canvas.width / (window.devicePixelRatio || 1);
-    const rows = 4 + state.level; // レベルで行数増加
+    const rows = 4 + state.level;
     const cols = 7;
     const margin = 30;
     const width = (cw - margin*2 - (cols-1)*5)/cols;
@@ -43,7 +44,7 @@
           width,
           height,
           broken:false,
-          color: `hsl(${Math.random()*360},70%,50%)` // ランダムカラー
+          color: `hsl(${Math.random()*360},70%,50%)`
         });
       }
     }
@@ -52,25 +53,21 @@
   function draw() {
     const cw = canvas.width / (window.devicePixelRatio || 1);
     const ch = canvas.height / (window.devicePixelRatio || 1);
-    // 背景グラデーション
     const grad = ctx.createLinearGradient(0,0,0,ch);
     grad.addColorStop(0,"#001a33");
     grad.addColorStop(1,"#003366");
     ctx.fillStyle = grad;
     ctx.fillRect(0,0,cw,ch);
 
-    // パドル
     ctx.fillStyle="lime";
     ctx.fillRect(paddle.x,paddle.y,paddle.width,paddle.height);
 
-    // ボール
     ctx.beginPath();
     ctx.arc(ball.x,ball.y,ball.radius,0,Math.PI*2);
     ctx.fillStyle="yellow";
     ctx.fill();
     ctx.closePath();
 
-    // ブロック
     for(let b of bricks){
       if(!b.broken){
         ctx.fillStyle = b.color;
@@ -187,3 +184,4 @@
   updateScore();
   showOverlay("タップしてゲームを始める", "スタート");
 })();
+
