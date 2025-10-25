@@ -7,28 +7,32 @@ const levelEl = document.getElementById("level");
 
 let cw, ch, paddle, ball, bricks = [], state = { playing: false, score: 0, level: 1 };
 
-// 🧭 Canvasサイズ設定
+// 📱 高DPI対応
 function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  cw = canvas.width;
-  ch = canvas.height;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  canvas.style.width = `${window.innerWidth}px`;
+  canvas.style.height = `${window.innerHeight}px`;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(dpr, dpr);
+  cw = window.innerWidth;
+  ch = window.innerHeight;
 }
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-// 🧱 ブロック・バー・ボール初期化
+// 🧱 初期化
 function resetBallAndPaddle() {
-  const base = cw; // 幅基準スケール
+  const base = cw;
   paddle = {
-    width: base * 0.25, // 画面幅の25%
-    height: base * 0.015, // 高さの1.5%
-    x: cw / 2 - base * 0.125,
+    width: base * 0.25,
+    height: base * 0.02,
+    x: (cw - base * 0.25) / 2,
     y: ch - base * 0.08,
     dx: 0
   };
-
-  const speed = Math.max(3, base / 400); // 小画面ではゆっくり
+  const speed = Math.max(2, base / 600);
   ball = {
     x: cw / 2,
     y: ch - base * 0.1,
@@ -58,7 +62,7 @@ function createBricks() {
   }
 }
 
-// ✏️ 描画関数
+// 🎨 描画関数
 function drawPaddle() {
   ctx.fillStyle = "#ff4f81";
   ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
@@ -78,7 +82,7 @@ function drawBricks() {
   });
 }
 
-// 🕹 ゲーム更新
+// 🕹 更新
 function update() {
   if (!state.playing) return;
 
@@ -125,7 +129,6 @@ function update() {
     }
   });
 
-  // 全部壊したら次のレベル
   if (remaining === 0) {
     state.level++;
     levelEl.textContent = `レベル: ${state.level}`;
@@ -134,7 +137,7 @@ function update() {
   }
 }
 
-// 🎬 ループ
+// 🔁 ループ
 function draw() {
   ctx.clearRect(0, 0, cw, ch);
   drawBricks();
@@ -144,9 +147,30 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-// 🖐️ 入力
+// 🖐 入力
 window.addEventListener("mousemove", e => {
   if (!state.playing) return;
   paddle.x = e.clientX - paddle.width / 2;
 });
-window.addEventListener("touchmove"
+window.addEventListener("touchmove", e => {
+  if (!state.playing) return;
+  const touch = e.touches[0];
+  paddle.x = touch.clientX - paddle.width / 2;
+});
+
+// 🚀 開始
+function startGame() {
+  state.playing = true;
+  state.score = 0;
+  state.level = 1;
+  scoreEl.textContent = "スコア: 0";
+  levelEl.textContent = "レベル: 1";
+  createBricks();
+  resetBallAndPaddle();
+  startScreen.style.display = "none";
+  draw();
+}
+
+startBtn.addEventListener("click", startGame);
+
+
