@@ -7,7 +7,7 @@ const levelEl = document.getElementById("level");
 
 let cw, ch, paddle, ball, bricks = [], state = { playing: false, score: 0, level: 1 };
 
-// 🧭 Canvasリサイズ（高DPI調整削除版）
+// 🧭 Canvasサイズ設定
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -17,47 +17,42 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-// 🎯 バーとボールの初期化
+// 🧱 ブロック・バー・ボール初期化
 function resetBallAndPaddle() {
-  paddle = { 
-    x: (cw - 180) / 2, 
-    y: ch - 60, 
-    width: 180, 
-    height: 12, 
-    speed: 7 + state.level, 
-    dx: 0 
+  const base = cw; // 幅基準スケール
+  paddle = {
+    width: base * 0.25, // 画面幅の25%
+    height: base * 0.015, // 高さの1.5%
+    x: cw / 2 - base * 0.125,
+    y: ch - base * 0.08,
+    dx: 0
   };
 
-  // 画面高さに応じて速度スケール（縦長Android調整）
-  const speedScale = ch / 800;
-  const baseSpeed = 2 / speedScale;
-
-  ball = { 
-    x: cw / 2, 
-    y: ch - 80, 
-    radius: 8, 
-    dx: (baseSpeed + state.level * 0.4), 
-    dy: -(baseSpeed + state.level * 0.4)
+  const speed = Math.max(3, base / 400); // 小画面ではゆっくり
+  ball = {
+    x: cw / 2,
+    y: ch - base * 0.1,
+    radius: base * 0.015,
+    dx: speed,
+    dy: -speed
   };
 }
 
-// 🧱 ブロック生成
 function createBricks() {
   const rows = 4 + state.level;
   const cols = 7;
-  const brickWidth = cw / cols - 6;
-  const brickHeight = 16;
+  const brickWidth = cw / cols - 8;
+  const brickHeight = cw * 0.03;
   bricks = [];
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      const color = `hsl(${Math.random() * 360}, 80%, 60%)`;
-      bricks.push({ 
-        x: c * (brickWidth + 6) + 3, 
-        y: r * (brickHeight + 6) + 50, 
-        width: brickWidth, 
-        height: brickHeight, 
-        visible: true, 
-        color 
+      bricks.push({
+        x: c * (brickWidth + 6) + 3,
+        y: r * (brickHeight + 6) + 60,
+        width: brickWidth,
+        height: brickHeight,
+        visible: true,
+        color: `hsl(${Math.random() * 360}, 80%, 60%)`
       });
     }
   }
@@ -94,10 +89,11 @@ function update() {
   ball.x += ball.dx;
   ball.y += ball.dy;
 
+  // 壁
   if (ball.x < ball.radius || ball.x > cw - ball.radius) ball.dx *= -1;
   if (ball.y < ball.radius) ball.dy *= -1;
 
-  // 下に落ちたらゲームオーバー
+  // 下に落ちた
   if (ball.y > ch - ball.radius) {
     state.playing = false;
     startScreen.innerHTML = `<h1>ゲームオーバー</h1><p>スコア: ${state.score}</p><button id='restartBtn'>リスタート</button>`;
@@ -122,14 +118,14 @@ function update() {
       ball.x > b.x && ball.x < b.x + b.width &&
       ball.y > b.y && ball.y < b.y + b.height
     ) {
-      ball.dy *= -1;
       b.visible = false;
+      ball.dy *= -1;
       state.score += 10;
       scoreEl.textContent = `スコア: ${state.score}`;
     }
   });
 
-  // 全ブロック破壊 → レベルアップ
+  // 全部壊したら次のレベル
   if (remaining === 0) {
     state.level++;
     levelEl.textContent = `レベル: ${state.level}`;
@@ -138,7 +134,7 @@ function update() {
   }
 }
 
-// 🎬 描画ループ
+// 🎬 ループ
 function draw() {
   ctx.clearRect(0, 0, cw, ch);
   drawBricks();
@@ -148,29 +144,9 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-// 🖐️ 入力対応
+// 🖐️ 入力
 window.addEventListener("mousemove", e => {
   if (!state.playing) return;
   paddle.x = e.clientX - paddle.width / 2;
 });
-window.addEventListener("touchmove", e => {
-  if (!state.playing) return;
-  const touch = e.touches[0];
-  paddle.x = touch.clientX - paddle.width / 2;
-});
-
-// 🚀 ゲーム開始
-function startGame() {
-  state.playing = true;
-  state.score = 0;
-  state.level = 1;
-  scoreEl.textContent = "スコア: 0";
-  levelEl.textContent = "レベル: 1";
-  createBricks();
-  resetBallAndPaddle();
-  startScreen.style.display = "none";
-  draw();
-}
-
-startBtn.addEventListener("click", startGame);
-
+window.addEventListener("touchmove"
